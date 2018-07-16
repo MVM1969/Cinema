@@ -13,19 +13,14 @@ import com.mvm.ticketing.TicketingServiceAction;
  */
 public class CinemaSeatingAction {
 
-	/**
-	 * @param args
-	 *            the command line arguments
-	 */
 	public static void main(String[] args) {
-		// TODO code application logic here
 		String line;
 		StringBuilder layout = new StringBuilder();
 		StringBuilder ticketRequests = new StringBuilder();
 		boolean isLayoutFinished = false;
 
 		System.out
-				.println("Please enter TheaterLayout and TicketRequests and then enter 'end'.\n");
+				.println("Please enter the cinema layout and ticket requests. When complete, type 'end'.\n");
 
 		Scanner input = new Scanner(System.in);
 

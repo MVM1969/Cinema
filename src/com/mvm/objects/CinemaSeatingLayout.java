@@ -4,6 +4,17 @@ import java.util.List;
 
 public class CinemaSeatingLayout {
 
+	public CinemaSeatingLayout(int totalCapacity, int availableSeats,
+			List<CinemaSeatingSection> sections) {
+		setTotalCapacity(totalCapacity);
+		setAvailableSeats(availableSeats);
+		setSections(sections);
+	}
+
+	public CinemaSeatingLayout() {
+
+	}
+
 	private int totalCapacity;
 	private int availableSeats;
 	private List<CinemaSeatingSection> sections;

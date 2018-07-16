@@ -2,11 +2,22 @@ package com.mvm.objects;
 
 public class TicketRequest {
 
+	public TicketRequest(String name, int numTickets, boolean isCompleted,
+			CinemaSeatingSection section) {
+		setName(name);
+		setNoOfTickets(numTickets);
+		setCompleted(isCompleted);
+		setSeatSection(section);
+	}
+
+	public TicketRequest() {
+		// TODO Auto-generated constructor stub
+	}
+
 	private String name;
 	private int noOfTickets;
 	private boolean isCompleted;
-	private int rowNumber;
-	private int sectionNumber;
+	private CinemaSeatingSection seatSection;
 
 	public String getName() {
 		return name;
@@ -32,20 +43,12 @@ public class TicketRequest {
 		this.isCompleted = isCompleted;
 	}
 
-	public int getRowNumber() {
-		return rowNumber;
+	public CinemaSeatingSection getSeatSection() {
+		return seatSection;
 	}
 
-	public void setRowNumber(int rowNumber) {
-		this.rowNumber = rowNumber;
-	}
-
-	public int getSectionNumber() {
-		return sectionNumber;
-	}
-
-	public void setSectionNumber(int sectionNumber) {
-		this.sectionNumber = sectionNumber;
+	public void setSeatSection(CinemaSeatingSection seatSection) {
+		this.seatSection = seatSection;
 	}
 
 	public String getStatus() {
@@ -54,12 +57,13 @@ public class TicketRequest {
 
 		if (isCompleted) {
 
-			status = name + " " + "Row " + rowNumber + " " + "Section "
-					+ sectionNumber;
+			status = name + " " + "Row " + seatSection.getRowNumber() + " "
+					+ "Section " + seatSection.getSectionNumber();
 
 		} else {
 
-			if (rowNumber == -1 && sectionNumber == -1) {
+			if (seatSection.getRowNumber() == -1
+					&& seatSection.getSectionNumber() == -1) {
 
 				status = name + " " + "Call to split party.";
 

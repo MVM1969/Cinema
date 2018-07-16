@@ -2,6 +2,17 @@ package com.mvm.objects;
 
 public class CinemaSeatingSection implements Comparable<CinemaSeatingSection> {
 
+	public CinemaSeatingSection(int row, int section, int capacity, int seats) {
+		setRowNumber(row);
+		setSectionNumber(section);
+		setCapacity(capacity);
+		setAvailableSeats(seats);
+	}
+
+	public CinemaSeatingSection() {
+
+	}
+
 	private int rowNumber;
 	private int sectionNumber;
 	private int capacity;

@@ -12,8 +12,7 @@ import com.mvm.objects.TicketRequest;
 public class TicketingServiceAction implements TicketingService {
 
 	@Override
-	public CinemaSeatingLayout getCinemaSeatingLayout(String rawLayout)
-			throws NumberFormatException {
+	public CinemaSeatingLayout getCinemaSeatingLayout(String rawLayout) throws NumberFormatException {
 
 		CinemaSeatingLayout CinemaSeatingLayout = new CinemaSeatingLayout();
 		CinemaSeatingSection section;
@@ -35,10 +34,7 @@ public class TicketingServiceAction implements TicketingService {
 				} catch (NumberFormatException nfe) {
 
 					throw new NumberFormatException(
-							"'"
-									+ sections[j]
-									+ "'"
-									+ " is invalid section capacity. Please correct it.");
+							"'" + sections[j] + "'" + " is invalid section capacity. Please correct it.");
 
 				}
 
@@ -65,8 +61,7 @@ public class TicketingServiceAction implements TicketingService {
 	}
 
 	@Override
-	public List<TicketRequest> getTicketRequests(String ticketRequests)
-			throws NumberFormatException {
+	public List<TicketRequest> getTicketRequests(String ticketRequests) throws NumberFormatException {
 
 		List<TicketRequest> requestsList = new ArrayList<TicketRequest>();
 		TicketRequest request;
@@ -87,8 +82,8 @@ public class TicketingServiceAction implements TicketingService {
 
 			} catch (NumberFormatException nfe) {
 
-				throw new NumberFormatException("'" + rData[1] + "'"
-						+ " is invalid ticket request. Please correct it.");
+				throw new NumberFormatException(
+						"'" + rData[1] + "'" + " is invalid ticket request. Please correct it.");
 			}
 			request.setCompleted(false);
 
@@ -103,11 +98,10 @@ public class TicketingServiceAction implements TicketingService {
 	/*
 	 * Find complementing request to avoid waste of seats.
 	 * 
-	 * We start index from currentRequestIndex+1, because all previous requests
-	 * are already completed.
+	 * We start index from currentRequestIndex+1, because all previous requests are
+	 * already completed.
 	 */
-	private int findComplementRequest(List<TicketRequest> requests,
-			int complementSeats, int currentRequestIndex) {
+	private int findComplementRequest(List<TicketRequest> requests, int complementSeats, int currentRequestIndex) {
 
 		int requestNo = -1;
 
@@ -115,8 +109,7 @@ public class TicketingServiceAction implements TicketingService {
 
 			TicketRequest request = requests.get(i);
 
-			if (!request.isCompleted()
-					&& request.getNoOfTickets() == complementSeats) {
+			if (!request.isCompleted() && request.getNoOfTickets() == complementSeats) {
 
 				requestNo = i;
 				break;
@@ -131,8 +124,7 @@ public class TicketingServiceAction implements TicketingService {
 	/*
 	 * Find section by it's available seats
 	 */
-	private int findSectionByAvailableSeats(
-			List<CinemaSeatingSection> sections, int availableSeats) {
+	private int findSectionByAvailableSeats(List<CinemaSeatingSection> sections, int availableSeats) {
 
 		int i = 0;
 		CinemaSeatingSection section = new CinemaSeatingSection();
@@ -150,13 +142,12 @@ public class TicketingServiceAction implements TicketingService {
 			}
 		};
 
-		int sectionNo = Collections.binarySearch(sections, section,
-				byAvailableSeats);
+		int sectionNo = Collections.binarySearch(sections, section, byAvailableSeats);
 
 		/*
-		 * sectionNo < 0 means could not find section sectionNo = 0 means found
-		 * section and it's very first one sectionNo > 0 means found section but
-		 * have to check for duplicate sections
+		 * sectionNo < 0 means could not find section sectionNo = 0 means found section
+		 * and it's very first one sectionNo > 0 means found section but have to check
+		 * for duplicate sections
 		 */
 
 		if (sectionNo > 0) {
@@ -184,25 +175,24 @@ public class TicketingServiceAction implements TicketingService {
 	 * 1) Iterate over all ticket requests 2) For each request,
 	 * 
 	 * - if total available seats are less than requested seats then 'we can't
-	 * handle the party'. - iterate over all theater sections starting from
-	 * first row
+	 * handle the party'. - iterate over all theater sections starting from first
+	 * row
 	 * 
 	 * - If requested tickets and section's available seats match EXACTLY then
 	 * assign it.
 	 * 
-	 * - If requested tickets < section's available seats - Find complement
-	 * request, if any (complement request = section's available seats -
-	 * original requested tickets) - If FOUND, complete assignment of original
-	 * and complement ticket requests - If NOT found - Find EXCATLY matching
-	 * section with requested no of tickets - If FOUND, assign it - If NOT
-	 * found, then assign the request to current section
+	 * - If requested tickets < section's available seats - Find complement request,
+	 * if any (complement request = section's available seats - original requested
+	 * tickets) - If FOUND, complete assignment of original and complement ticket
+	 * requests - If NOT found - Find EXCATLY matching section with requested no of
+	 * tickets - If FOUND, assign it - If NOT found, then assign the request to
+	 * current section
 	 * 
 	 * - If request is INCOMPLETE, 'Call party to split.'
 	 */
 
 	@Override
-	public void processTicketRequests(CinemaSeatingLayout layout,
-			List<TicketRequest> requests) {
+	public void processTicketRequests(CinemaSeatingLayout layout, List<TicketRequest> requests) {
 
 		for (int i = 0; i < requests.size(); i++) {
 
@@ -215,8 +205,8 @@ public class TicketingServiceAction implements TicketingService {
 			 */
 			if (request.getNoOfTickets() > layout.getAvailableSeats()) {
 
-				request.setRowNumber(-2);
-				request.setSectionNumber(-2);
+				request.getSeatSection().setRowNumber(-2);
+				request.getSeatSection().setSectionNumber(-2);
 				continue;
 
 			}
@@ -229,77 +219,58 @@ public class TicketingServiceAction implements TicketingService {
 
 				if (request.getNoOfTickets() == section.getAvailableSeats()) {
 
-					request.setRowNumber(section.getRowNumber());
-					request.setSectionNumber(section.getSectionNumber());
-					section.setAvailableSeats(section.getAvailableSeats()
-							- request.getNoOfTickets());
-					layout.setAvailableSeats(layout.getAvailableSeats()
-							- request.getNoOfTickets());
+					section.setRowNumber(request.getSeatSection().getRowNumber());
+					section.setSectionNumber(request.getSeatSection().getSectionNumber());
+					section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
+					layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 					request.setCompleted(true);
 					break;
 
-				} else if (request.getNoOfTickets() < section
-						.getAvailableSeats()) {
+				} else if (request.getNoOfTickets() < section.getAvailableSeats()) {
 
-					int requestNo = findComplementRequest(
-							requests,
-							section.getAvailableSeats()
-									- request.getNoOfTickets(), i);
+					int requestNo = findComplementRequest(requests,
+							section.getAvailableSeats() - request.getNoOfTickets(), i);
 
 					if (requestNo != -1) {
 
-						request.setRowNumber(section.getRowNumber());
-						request.setSectionNumber(section.getSectionNumber());
-						section.setAvailableSeats(section.getAvailableSeats()
-								- request.getNoOfTickets());
-						layout.setAvailableSeats(layout.getAvailableSeats()
-								- request.getNoOfTickets());
+						request.getSeatSection().setRowNumber(section.getRowNumber());
+						request.getSeatSection().setSectionNumber(section.getSectionNumber());
+						section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
+						layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 						request.setCompleted(true);
 
-						TicketRequest complementRequest = requests
-								.get(requestNo);
+						TicketRequest complementRequest = requests.get(requestNo);
 
-						complementRequest.setRowNumber(section.getRowNumber());
-						complementRequest.setSectionNumber(section
-								.getSectionNumber());
-						section.setAvailableSeats(section.getAvailableSeats()
-								- complementRequest.getNoOfTickets());
-						layout.setAvailableSeats(layout.getAvailableSeats()
-								- complementRequest.getNoOfTickets());
+						complementRequest.getSeatSection().setRowNumber(section.getRowNumber());
+						complementRequest.getSeatSection().setSectionNumber(section.getSectionNumber());
+						section.setAvailableSeats(section.getAvailableSeats() - complementRequest.getNoOfTickets());
+						layout.setAvailableSeats(layout.getAvailableSeats() - complementRequest.getNoOfTickets());
 						complementRequest.setCompleted(true);
 
 						break;
 
 					} else {
 
-						int sectionNo = findSectionByAvailableSeats(sections,
-								request.getNoOfTickets());
+						int sectionNo = findSectionByAvailableSeats(sections, request.getNoOfTickets());
 
 						if (sectionNo >= 0) {
 
-							CinemaSeatingSection perferctSection = sections
-									.get(sectionNo);
+							CinemaSeatingSection perferctSection = sections.get(sectionNo);
 
-							request.setRowNumber(perferctSection.getRowNumber());
-							request.setSectionNumber(perferctSection
-									.getSectionNumber());
-							perferctSection.setAvailableSeats(perferctSection
-									.getAvailableSeats()
-									- request.getNoOfTickets());
-							layout.setAvailableSeats(layout.getAvailableSeats()
-									- request.getNoOfTickets());
+							request.getSeatSection().setRowNumber(perferctSection.getRowNumber());
+							request.getSeatSection().setSectionNumber(perferctSection.getSectionNumber());
+							perferctSection
+									.setAvailableSeats(perferctSection.getAvailableSeats() - request.getNoOfTickets());
+							layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 							request.setCompleted(true);
 							break;
 
 						} else {
 
-							request.setRowNumber(section.getRowNumber());
-							request.setSectionNumber(section.getSectionNumber());
-							section.setAvailableSeats(section
-									.getAvailableSeats()
-									- request.getNoOfTickets());
-							layout.setAvailableSeats(layout.getAvailableSeats()
-									- request.getNoOfTickets());
+							request.getSeatSection().setRowNumber(section.getRowNumber());
+							request.getSeatSection().setSectionNumber(section.getSectionNumber());
+							section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
+							layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 							request.setCompleted(true);
 							break;
 
@@ -316,8 +287,8 @@ public class TicketingServiceAction implements TicketingService {
 			 */
 			if (!request.isCompleted()) {
 
-				request.setRowNumber(-1);
-				request.setSectionNumber(-1);
+				request.getSeatSection().setRowNumber(-1);
+				request.getSeatSection().setSectionNumber(-1);
 
 			}
 

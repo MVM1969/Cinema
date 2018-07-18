@@ -10,7 +10,7 @@ public class CinemaSeatingSection implements Comparable<CinemaSeatingSection> {
 	}
 
 	public CinemaSeatingSection() {
-
+		// TODO Auto-generated constructor stub
 	}
 
 	private int rowNumber;

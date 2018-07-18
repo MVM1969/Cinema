@@ -14,7 +14,7 @@ public class TicketingServiceAction implements TicketingService {
 	@Override
 	public CinemaSeatingLayout getCinemaSeatingLayout(String rawLayout) throws NumberFormatException {
 
-		CinemaSeatingLayout CinemaSeatingLayout = new CinemaSeatingLayout();
+		CinemaSeatingLayout cinemaSeatingLayout = new CinemaSeatingLayout();
 		CinemaSeatingSection section;
 		List<CinemaSeatingSection> sectionsList = new ArrayList<CinemaSeatingSection>();
 		int totalCapacity = 0, value;
@@ -40,11 +40,7 @@ public class TicketingServiceAction implements TicketingService {
 
 				totalCapacity = totalCapacity + value;
 
-				section = new CinemaSeatingSection();
-				section.setRowNumber(i + 1);
-				section.setSectionNumber(j + 1);
-				section.setCapacity(value);
-				section.setAvailableSeats(value);
+				section = new CinemaSeatingSection(i + 1, j + 1, value, value);
 
 				sectionsList.add(section);
 
@@ -52,11 +48,11 @@ public class TicketingServiceAction implements TicketingService {
 
 		}
 
-		CinemaSeatingLayout.setTotalCapacity(totalCapacity);
-		CinemaSeatingLayout.setAvailableSeats(totalCapacity);
-		CinemaSeatingLayout.setSections(sectionsList);
+		cinemaSeatingLayout.setTotalCapacity(totalCapacity);
+		cinemaSeatingLayout.setAvailableSeats(totalCapacity);
+		cinemaSeatingLayout.setSections(sectionsList);
 
-		return CinemaSeatingLayout;
+		return cinemaSeatingLayout;
 
 	}
 
@@ -122,7 +118,7 @@ public class TicketingServiceAction implements TicketingService {
 	}
 
 	/*
-	 * Find section by it's available seats
+	 * Find section by its available seats
 	 */
 	private int findSectionByAvailableSeats(List<CinemaSeatingSection> sections, int availableSeats) {
 
@@ -142,17 +138,17 @@ public class TicketingServiceAction implements TicketingService {
 			}
 		};
 
-		int sectionNo = Collections.binarySearch(sections, section, byAvailableSeats);
+		int sectionNum = Collections.binarySearch(sections, section, byAvailableSeats);
 
 		/*
-		 * sectionNo < 0 means could not find section sectionNo = 0 means found section
-		 * and it's very first one sectionNo > 0 means found section but have to check
-		 * for duplicate sections
+		 * sectionNum < 0 - can't find section Number sectionNum == 0 - found the
+		 * section Number and it's the first one. sectionNum > 0 - found the section
+		 * number and need to check for dupes.
 		 */
 
-		if (sectionNo > 0) {
+		if (sectionNum > 0) {
 
-			for (i = sectionNo - 1; i >= 0; i--) {
+			for (i = sectionNum - 1; i >= 0; i--) {
 
 				CinemaSeatingSection s = sections.get(i);
 
@@ -161,11 +157,11 @@ public class TicketingServiceAction implements TicketingService {
 
 			}
 
-			sectionNo = i + 1;
+			sectionNum = i + 1;
 
 		}
 
-		return sectionNo;
+		return sectionNum;
 	}
 
 	/*
@@ -197,6 +193,7 @@ public class TicketingServiceAction implements TicketingService {
 		for (int i = 0; i < requests.size(); i++) {
 
 			TicketRequest request = requests.get(i);
+			CinemaSeatingSection section = new CinemaSeatingSection();
 			if (request.isCompleted())
 				continue;
 
@@ -204,9 +201,9 @@ public class TicketingServiceAction implements TicketingService {
 			 * -2 is an indicator when we can't handle the party.
 			 */
 			if (request.getNoOfTickets() > layout.getAvailableSeats()) {
-
-				request.getSeatSection().setRowNumber(-2);
-				request.getSeatSection().setSectionNumber(-2);
+				section.setRowNumber(-2);
+				section.setSectionNumber(-2);
+				request.setSeatSection(section);
 				continue;
 
 			}
@@ -215,12 +212,11 @@ public class TicketingServiceAction implements TicketingService {
 
 			for (int j = 0; j < sections.size(); j++) {
 
-				CinemaSeatingSection section = sections.get(j);
+				section = sections.get(j);
 
 				if (request.getNoOfTickets() == section.getAvailableSeats()) {
 
-					section.setRowNumber(request.getSeatSection().getRowNumber());
-					section.setSectionNumber(request.getSeatSection().getSectionNumber());
+					request.setSeatSection(section);
 					section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
 					layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 					request.setCompleted(true);
@@ -233,16 +229,14 @@ public class TicketingServiceAction implements TicketingService {
 
 					if (requestNo != -1) {
 
-						request.getSeatSection().setRowNumber(section.getRowNumber());
-						request.getSeatSection().setSectionNumber(section.getSectionNumber());
+						request.setSeatSection(section);
 						section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
 						layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 						request.setCompleted(true);
 
 						TicketRequest complementRequest = requests.get(requestNo);
 
-						complementRequest.getSeatSection().setRowNumber(section.getRowNumber());
-						complementRequest.getSeatSection().setSectionNumber(section.getSectionNumber());
+						complementRequest.setSeatSection(section);
 						section.setAvailableSeats(section.getAvailableSeats() - complementRequest.getNoOfTickets());
 						layout.setAvailableSeats(layout.getAvailableSeats() - complementRequest.getNoOfTickets());
 						complementRequest.setCompleted(true);
@@ -255,20 +249,19 @@ public class TicketingServiceAction implements TicketingService {
 
 						if (sectionNo >= 0) {
 
-							CinemaSeatingSection perferctSection = sections.get(sectionNo);
+							CinemaSeatingSection matchedSection = sections.get(sectionNo);
 
-							request.getSeatSection().setRowNumber(perferctSection.getRowNumber());
-							request.getSeatSection().setSectionNumber(perferctSection.getSectionNumber());
-							perferctSection
-									.setAvailableSeats(perferctSection.getAvailableSeats() - request.getNoOfTickets());
+							request.setSeatSection(matchedSection);
+
+							matchedSection
+									.setAvailableSeats(matchedSection.getAvailableSeats() - request.getNoOfTickets());
 							layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 							request.setCompleted(true);
 							break;
 
 						} else {
 
-							request.getSeatSection().setRowNumber(section.getRowNumber());
-							request.getSeatSection().setSectionNumber(section.getSectionNumber());
+							request.setSeatSection(section);
 							section.setAvailableSeats(section.getAvailableSeats() - request.getNoOfTickets());
 							layout.setAvailableSeats(layout.getAvailableSeats() - request.getNoOfTickets());
 							request.setCompleted(true);
@@ -286,9 +279,9 @@ public class TicketingServiceAction implements TicketingService {
 			 * -1 is an indicator when we need to split the party.
 			 */
 			if (!request.isCompleted()) {
-
-				request.getSeatSection().setRowNumber(-1);
-				request.getSeatSection().setSectionNumber(-1);
+				section.setRowNumber(-1);
+				section.setSectionNumber(-1);
+				request.setSeatSection(section);
 
 			}
 
